@@ -102,6 +102,18 @@ public class Driver {
     public static void testRun() {
         if (testHeap) {
             // test out Heap.java here
+            cities.get(2).setMinDist(4);
+            cities.get(3).setMinDist(5);
+            cities.get(1).setMinDist(3);
+            Heap tester = new Heap();
+            tester.buildHeap(cities);
+
+            City addCity = new City(8);
+            addCity.setMinDist(2);
+
+            tester.insertNode(addCity);
+
+            System.out.println(tester.extractMin().getName());
 
         }
 

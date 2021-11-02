@@ -16,6 +16,7 @@ public class Heap {
         minHeap = new ArrayList<City>();
     }
 
+
     /**
      * buildHeap(ArrayList<City> cities)
      * Given an ArrayList of Cities, build a min-heap keyed on each City's minDist
@@ -25,8 +26,69 @@ public class Heap {
      */
     public void buildHeap(ArrayList<City> cities) {
         // TODO: implement this method
-        //I like pies
+//        City placeholder = new City(-1);
+//        placeholder.setIndex(-1);
+//        placeholder.setMinDist(-1);
+//        minHeap.add(placeholder);
+        //Add each city into heap
+        for(int c = 0; c < cities.size(); c++)
+        {
+            //base case
+            if(minHeap.size() == 0)
+            {
+                minHeap.add(cities.get(c));
+                cities.get(c).setPosition(c);
+            }
+            else
+            {
+                minHeap.add(cities.get(c));
+                cities.get(c).setPosition(c);
+                int indexUpdate = minHeap.size() - 1;
+                //Add in Log(n) time to maintain min-heap property
+
+                //                while(minHeap.get(indexUpdate).getMinDist() < minHeap.get((indexUpdate - 1) / 2).getMinDist()){
+                while(minHeap.get(indexUpdate).getMinDist() <= minHeap.get((indexUpdate - 1) / 2).getMinDist()){
+                    ////////////////////////
+                    boolean done = false;
+                    if(minHeap.get(indexUpdate).getMinDist() == minHeap.get((indexUpdate - 1) / 2).getMinDist()){
+                        if(minHeap.get(indexUpdate).getName() < minHeap.get((indexUpdate - 1) / 2).getName()){
+                            minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+                            minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
+
+                            //flip city values
+                            City fooNode = minHeap.get(indexUpdate);
+                            minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+                            minHeap.set((indexUpdate - 1) / 2, fooNode);
+
+                            indexUpdate = (indexUpdate - 1) / 2;
+                            done = true;
+                        }
+                        else{break;}
+                    }
+                    if(!done){
+                        minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+                        minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
+
+                        //flip city values
+                        City fooNode = minHeap.get(indexUpdate);
+                        minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+                        minHeap.set((indexUpdate - 1) / 2, fooNode);
+
+                        indexUpdate = (indexUpdate - 1) / 2;
+
+                    }
+                    /////////////////////////
+                    //flip indices
+
+                }
+
+            }
+        }
     }
+
+
+
+
 
     /**
      * insertNode(City in)
@@ -37,6 +99,25 @@ public class Heap {
      */
     public void insertNode(City in) {
         // TODO: implement this method
+        minHeap.add(in);
+        in.setPosition(minHeap.size() - 1);
+        in.setParent(-1);
+        in.setTreeStatus(true);
+
+        int indexUpdate = minHeap.size() - 1;
+
+        while(minHeap.get(indexUpdate).getMinDist() < minHeap.get((indexUpdate - 1) / 2).getMinDist()){
+            //flip indices
+            minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+            minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
+
+            //flip city values
+            City fooNode = minHeap.get(indexUpdate);
+            minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+            minHeap.set((indexUpdate - 1) / 2, fooNode);
+
+            indexUpdate = (indexUpdate - 1) / 2;
+        }
     }
 
     /**
@@ -47,7 +128,7 @@ public class Heap {
      */
     public City findMin() {
         // TODO: implement this method
-        return null;
+        return minHeap.get(0);
     }
 
     /**
@@ -58,7 +139,81 @@ public class Heap {
      */
     public City extractMin() {
         // TODO: implement this method
-        return null;
+        //base case
+        if(minHeap.size() == 0)
+        {
+            return new City(-9999);
+        }
+        //base case
+        if(minHeap.size() == 1)
+        {
+            minHeap.get(0).setPosition(-1);
+            return minHeap.remove(0);
+        }
+
+        //remove root
+        City returnCity = minHeap.get(0);
+        minHeap.set(0, minHeap.get(minHeap.size() - 1));                ////Might need to set the position here to 0
+        minHeap.get(0).setPosition(0);
+        minHeap.remove(minHeap.size() - 1);
+
+        heapifyDown(0);
+
+        returnCity.setTreeStatus(false);
+        return returnCity;
+    }
+
+    /**
+     * Basic heapify down function starting from given index
+     * @param index
+     */
+    public void heapifyDown(int index){
+        int parent, childOne, childTwo;
+        parent = index;
+        childOne = index * 2 + 1;
+        childTwo = index * 2 + 2;
+
+        boolean flagSmallerFound = false;
+
+        if(childOne < minHeap.size() && minHeap.get(childOne).getMinDist() < minHeap.get(parent).getMinDist()){
+            parent = childOne;
+            //flagSmallerFound = true;
+
+            minHeap.get(index).setPosition(parent);
+            minHeap.get(parent).setPosition(index);
+
+            City fooNode = minHeap.get(index);
+            minHeap.set(index, minHeap.get(parent));
+            minHeap.set(parent, fooNode);
+
+            heapifyDown(parent);
+        }
+
+        if(childTwo < minHeap.size() && minHeap.get(childTwo).getMinDist() < minHeap.get(parent).getMinDist()){
+            parent = childTwo;
+            //flagSmallerFound = true;
+
+            minHeap.get(index).setPosition(parent);
+            minHeap.get(parent).setPosition(index);
+
+            City fooNode = minHeap.get(index);
+            minHeap.set(index, minHeap.get(parent));
+            minHeap.set(parent, fooNode);
+
+            heapifyDown(parent);
+        }
+//        if(flagSmallerFound)
+//        {
+//            //changeNodes(index, parent);
+//            minHeap.get(index).setPosition(parent);
+//            minHeap.get(parent).setPosition(index);
+//
+//            City fooNode = minHeap.get(index);
+//            minHeap.set(index, minHeap.get(parent));
+//            minHeap.set(parent, fooNode);
+//
+//            heapifyDown(parent);
+//        }
     }
 
     /**
@@ -70,6 +225,18 @@ public class Heap {
      */
     public void delete(int index) {
         // TODO: implement this method
+
+        if(minHeap.size() == 0){
+            return;
+        }
+        else{
+            int position = minHeap.get(index).getPosition();
+
+            minHeap.set(index, minHeap.get(minHeap.size() - 1));
+            minHeap.get(index).setPosition(position);
+            minHeap.remove(minHeap.size() - 1);
+            heapifyDown(index);
+        }
     }
 
     /**
@@ -82,7 +249,30 @@ public class Heap {
      */
     public void changeKey(City r, int newDist) {
         // TODO: implement this method
+        if(minHeap.size() == 1)
+        {
+            minHeap.get(r.getPosition()).setMinDist(newDist);
+        }
+        else{
+            minHeap.get(r.getPosition()).setMinDist(newDist);
+            int indexUpdate = r.getPosition();
+            while(minHeap.get(indexUpdate).getMinDist() < minHeap.get((indexUpdate - 1) / 2).getMinDist()){
+                //flip indices
+                minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+                minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
+
+                //flip cities
+                City fooNode = minHeap.get(indexUpdate);
+                minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+                minHeap.set((indexUpdate - 1) / 2, fooNode);
+
+                indexUpdate = (indexUpdate - 1) / 2;
+            }
+        }
+
     }
+
+    public int getSize() { return minHeap.size();};
 
     public String toString() {
         String output = "";

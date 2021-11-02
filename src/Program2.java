@@ -8,6 +8,7 @@
 // Include this file in your final submission
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class Program2 {
     private ArrayList<City> cities;  // this is a list of all Cities, populated by Driver class
@@ -29,15 +30,38 @@ public class Program2 {
      */
     public int findMinimumRouteDistance(City start, City dest) {
         // TODO: implement this function
+        Heap minHeap = new Heap();
 
-        ArrayList<Integer> visited = new ArrayList<>();
-        ArrayList<Integer> notVisited = new ArrayList<>();
+        //Set first city to have distance of 0
+        start.setMinDist(0);
+        minHeap.buildHeap(cities);
 
+        ArrayList<City> neighborsInit = start.getNeighbors();
+        ArrayList<Integer> weightsInit = start.getWeights();
+        minHeap.delete(start.getPosition());
+        //Change the min-dists
+        for(int i = 0; i < start.getNeighbors().size(); i ++){
+            //neighborsInit.get(i).setParent(start);
+            minHeap.changeKey(neighborsInit.get(i), weightsInit.get(i));
+        }
 
+        while(minHeap.getSize() != 0)
+        {
+            City city = minHeap.findMin();
+            ArrayList<City> neighbors = city.getNeighbors();
+            ArrayList<Integer> weights = city.getWeights();
+            minHeap.delete(city.getPosition());
 
-
-
-        return -1;
+            //Change the min-dists
+            for(int i = 0; i < city.getNeighbors().size(); i ++){
+                //If u.d > v.d + w(v, u)
+                if(neighbors.get(i).getMinDist() > weights.get(i) + city.getMinDist()){
+                    //neighbors.get(i).setParent(city);
+                    minHeap.changeKey(neighbors.get(i), weights.get(i) + city.getMinDist());
+                }
+            }
+        }
+        return dest.getMinDist();
     }
 
     /**
@@ -48,6 +72,39 @@ public class Program2 {
      */
     public int findMinimumLength() {
         // TODO: implement this function
+        if(cities.size() < 2){
+            return 0;
+        }
+
+        Heap minHeap = new Heap();
+        int totalWeight = 0;
+        //ArrayList<City> MST = new ArrayList<City>();
+
+        //Set arbitrary first city to have distance of 0
+        cities.get(0).setMinDist(0);
+        minHeap.buildHeap(cities);
+
+        while(minHeap.getSize() != 0)
+        {
+            if(minHeap.getSize() == 1)
+            {
+                City minCity = minHeap.findMin();
+                totalWeight += minCity.getMinDist();
+                return totalWeight;
+            }
+            City minCity = minHeap.findMin();
+            totalWeight += minCity.getMinDist();
+            minCity = minHeap.extractMin();
+            //MST.add(minCity);
+            ArrayList<City> neighbors = minCity.getNeighbors();
+            ArrayList<Integer> weights = minCity.getWeights();
+
+            for(int i = 0; i < neighbors.size(); i++){
+                if(neighbors.get(i).getTreeStatus() && neighbors.get(i).getMinDist() > weights.get(i)){
+                    minHeap.changeKey(neighbors.get(i), weights.get(i));
+                }
+            }
+        }
         return -1;
     }
 
@@ -74,7 +131,6 @@ public class Program2 {
             o += System.getProperty("line.separator");
 
         }
-
         return o;
     }
 

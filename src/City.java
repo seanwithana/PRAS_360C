@@ -14,18 +14,29 @@ public class City {
     private ArrayList<City> neighbors;
     private ArrayList<Integer> weights;
     private int parentCity;
-    private int index;
+    private int position;
+    private boolean inTree;
 
     public City(int x) {
         name = x;
         minDist = Integer.MAX_VALUE;
         neighbors = new ArrayList<City>();
         weights = new ArrayList<Integer>();
+        position = -1;
+        parentCity = -1;
+        inTree = true;
     }
 
-    public void setIndex(int ind){index = ind; }
+    public void setPosition(int ind){position = ind; }
+    public int getPosition(){ return this.position;
+    }
 
-    public void setParent(City c){parentCity = c.getName(); }
+    public void setTreeStatus(boolean inTree)
+    {
+        this.inTree = inTree;
+    }
+    public boolean getTreeStatus(){return this.inTree;}
+    public void setParent(int c){parentCity = c; }
 
     public void setNeighborAndWeight(City n, Integer w) {
         neighbors.add(n);
