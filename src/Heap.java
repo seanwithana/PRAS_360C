@@ -106,17 +106,37 @@ public class Heap {
 
         int indexUpdate = minHeap.size() - 1;
 
-        while(minHeap.get(indexUpdate).getMinDist() < minHeap.get((indexUpdate - 1) / 2).getMinDist()){
-            //flip indices
-            minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
-            minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
+        while(minHeap.get(indexUpdate).getMinDist() <= minHeap.get((indexUpdate - 1) / 2).getMinDist()) {
+            ////////////////////////
+            boolean done = false;
+            if (minHeap.get(indexUpdate).getMinDist() == minHeap.get((indexUpdate - 1) / 2).getMinDist()) {
+                if (minHeap.get(indexUpdate).getName() < minHeap.get((indexUpdate - 1) / 2).getName()) {
+                    minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+                    minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
 
-            //flip city values
-            City fooNode = minHeap.get(indexUpdate);
-            minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
-            minHeap.set((indexUpdate - 1) / 2, fooNode);
+                    //flip city values
+                    City fooNode = minHeap.get(indexUpdate);
+                    minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+                    minHeap.set((indexUpdate - 1) / 2, fooNode);
 
-            indexUpdate = (indexUpdate - 1) / 2;
+                    indexUpdate = (indexUpdate - 1) / 2;
+                    done = true;
+                } else {
+                    break;
+                }
+            }
+            if (!done) {
+                minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+                minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
+
+                //flip city values
+                City fooNode = minHeap.get(indexUpdate);
+                minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+                minHeap.set((indexUpdate - 1) / 2, fooNode);
+
+                indexUpdate = (indexUpdate - 1) / 2;
+
+            }
         }
     }
 
@@ -254,20 +274,60 @@ public class Heap {
             minHeap.get(r.getPosition()).setMinDist(newDist);
         }
         else{
+            int oldDist = r.getMinDist();
             minHeap.get(r.getPosition()).setMinDist(newDist);
             int indexUpdate = r.getPosition();
-            while(minHeap.get(indexUpdate).getMinDist() < minHeap.get((indexUpdate - 1) / 2).getMinDist()){
-                //flip indices
-                minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
-                minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
 
-                //flip cities
-                City fooNode = minHeap.get(indexUpdate);
-                minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
-                minHeap.set((indexUpdate - 1) / 2, fooNode);
+            if(oldDist > newDist){
+                while(minHeap.get(indexUpdate).getMinDist() < minHeap.get((indexUpdate - 1) / 2).getMinDist()){
+                    //flip indices
+                    minHeap.get(indexUpdate).setPosition((indexUpdate - 1) / 2);
+                    minHeap.get((indexUpdate - 1) / 2).setPosition(indexUpdate);
 
-                indexUpdate = (indexUpdate - 1) / 2;
+                    //flip cities
+                    City fooNode = minHeap.get(indexUpdate);
+                    minHeap.set(indexUpdate, minHeap.get((indexUpdate - 1) / 2));
+                    minHeap.set((indexUpdate - 1) / 2, fooNode);
+
+                    indexUpdate = (indexUpdate - 1) / 2;
+                }
             }
+
+            if(oldDist < newDist){
+                while((indexUpdate * 2) + 2 <= minHeap.size() && (minHeap.get(indexUpdate).getMinDist() > minHeap.get((indexUpdate * 2) + 1).getMinDist() ||
+                        minHeap.get(indexUpdate).getMinDist() > minHeap.get((indexUpdate * 2) + 2).getMinDist() )
+                        ){
+                    if(minHeap.get(indexUpdate).getMinDist() > minHeap.get((indexUpdate * 2) + 1).getMinDist()){
+                        //flip indices
+                        minHeap.get(indexUpdate).setPosition((indexUpdate * 2) + 1);
+                        minHeap.get((indexUpdate * 2) + 1).setPosition(indexUpdate);
+
+                        //flip cities
+                        City fooNode = minHeap.get(indexUpdate);
+                        minHeap.set(indexUpdate, minHeap.get((indexUpdate * 2) + 1));
+                        minHeap.set((indexUpdate * 2) + 1, fooNode);
+
+                        indexUpdate = (indexUpdate * 2) + 1;
+                        continue;
+                    }
+                    if(minHeap.get(indexUpdate).getMinDist() > minHeap.get((indexUpdate * 2) + 2).getMinDist()){
+                        //flip indices
+                        minHeap.get(indexUpdate).setPosition((indexUpdate * 2) + 2);
+                        minHeap.get((indexUpdate * 2) + 2).setPosition(indexUpdate);
+
+                        //flip cities
+                        City fooNode = minHeap.get(indexUpdate);
+                        minHeap.set(indexUpdate, minHeap.get((indexUpdate * 2) + 2));
+                        minHeap.set((indexUpdate * 2) + 2, fooNode);
+
+                        indexUpdate = (indexUpdate * 2) + 2;
+                        continue;
+                    }
+                }
+            }
+
+
+
         }
 
     }
